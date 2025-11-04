@@ -31,6 +31,12 @@ parameters:
 			path: src/Properties/HigherOrderCollectionProxyPropertyExtension.php
 
 		-
+			rawMessage: 'Call to function method_exists() with Illuminate\Database\Eloquent\Model and ''casts'' will always evaluate to true.'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Properties/ModelCastHelper.php
+
+		-
 			rawMessage: 'Call to internal method Symfony\Component\Console\Command\Command::mergeApplicationDefinition() from outside its root namespace Symfony.'
 			identifier: method.internal
 			count: 1

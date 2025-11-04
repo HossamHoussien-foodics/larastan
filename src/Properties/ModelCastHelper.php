@@ -51,6 +51,7 @@ use function array_map;
 use function array_merge;
 use function class_exists;
 use function explode;
+use function method_exists;
 use function str_replace;
 
 class ModelCastHelper
@@ -248,19 +249,21 @@ class ModelCastHelper
 
         $modelCasts = $modelInstance->getCasts();
 
-        $castsMethodReturnType = $modelClassReflection->getMethod(
-            'casts',
-            new OutOfClassScope(),
-        )->getVariants()[0]->getReturnType();
+        if (method_exists($modelInstance, 'casts')) {
+            $castsMethodReturnType = $modelClassReflection->getMethod(
+                'casts',
+                new OutOfClassScope(),
+            )->getVariants()[0]->getReturnType();
 
-        if ($castsMethodReturnType->isConstantArray()->yes()) {
-            $modelCasts = array_merge(
-                $modelCasts,
-                array_combine(
-                    array_map(static fn ($key) => $key->getValue(), $castsMethodReturnType->getKeyTypes()), // @phpstan-ignore-line
-                    array_map(static fn ($value) => str_replace('\\\\', '\\', $value->getValue()), $castsMethodReturnType->getValueTypes()), // @phpstan-ignore-line
-                ),
-            );
+            if ($castsMethodReturnType->isConstantArray()->yes()) {
+                $modelCasts = array_merge(
+                    $modelCasts,
+                    array_combine(
+                        array_map(static fn ($key) => $key->getValue(), $castsMethodReturnType->getKeyTypes()), // @phpstan-ignore-line
+                        array_map(static fn ($value) => str_replace('\\\\', '\\', $value->getValue()), $castsMethodReturnType->getValueTypes()), // @phpstan-ignore-line
+                    ),
+                );
+            }
         }
 
         $this->modelCasts[$className] = $modelCasts;
